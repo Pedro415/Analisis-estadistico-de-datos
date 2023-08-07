@@ -1,0 +1,177 @@
+---
+title: "Taller 7 mardown"
+author: 'Esteban Hernández Ramírez, Pedro Alejandro Baquero, Daniel Zarate, Julian
+  castro '
+date: "2022-11-21"
+output:
+  word_document: default
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+if(!require('fdm2id')) {
+  install.packages('fdm2id')
+  library('fdm2id')
+}
+```
+
+## R Markdown
+
+Punto 1 a 
+
+```{r}
+x1 = array(c(3,2,4,7,4,7), dim=c(3, 2))
+x2 = array(c(6,5,4,9,7,8), dim=c(3, 2))
+x1barr = array(c(3,6), dim=c(2, 1))
+x2barr = array(c(5,8), dim=c(2, 1))
+spooled = array(c(1,1,1,2), dim=c(2, 2))
+spinver=solve(spooled)
+spinver
+x1x2=(x1barr - x2barr)
+x1x2
+x1x2sum = (x1barr + x2barr)
+x1x2sum
+x1x2t=t(x1x2)  
+x1x2t
+x1x2t%*%spinver
+```
+
+Por lo que da -2x1 + 0x2
+
+Punto 1 b
+
+```{r}
+xcero= array(c(2,7), dim=c(2, 1))
+xcero
+a = x1x2t%*%(spinver%*%xcero)
+a
+x1x2sum= (x1barr + x2barr)
+m = (0.5*x1x2t)%*%spinver %*% x1x2sum
+m
+if (a>m) {
+  print("Se toma pi 1")
+} else if (a==m){
+  print("Se toma pi 1")
+} else {
+  print ("Se toma pi 2")
+}
+```
+
+Para los puntos c ,d, e usamos el ejemplo de las podadoras del libro
+
+Punto 2 c 
+
+```{r}
+n1=12
+n2=12
+pi1 = array(c(c(90, 115.5, 94.8, 91.5, 117, 140.10, 138.0, 112.8, 99, 123, 81, 111),
+                  c(18.4, 16.8, 21.6, 20.8, 23.6, 19.2, 17.6, 22.4, 20, 20.8, 22, 20)), dim=c(n1, 2))
+
+pi2 = array(c(c(105, 82.8, 94.8, 73.2, 114, 79.2, 89.4, 96, 77.4, 63, 81, 93),
+                  c(19.6, 20.8, 17.2, 20.4, 17.6, 17.6, 16, 18.4, 16.4, 18.8, 14, 14.8)), dim=c(n2, 2))
+ 
+x1barrct = colMeans(pi1)
+x1barrc= t(x1barrct)
+x2barrct = colMeans(pi2)
+x2barrc= t(x2barrct)
+s1 = cov(pi1)
+s2 = cov(pi2)
+ty=(n1-1)/((n1-1)+(n2-1))
+th=(n2-1)/((n1-1)+(n2-1))
+spooledc= (ty*s1) + (th*s2)
+spooledc
+
+spinverc=solve(spooledc)
+spinverc
+x1x2c=(x1barrc - x2barrc)
+x1x2c
+x1x2sumc = (x1barrc + x2barrc)
+x1x2sumc
+ac = x1x2c%*%spinverc
+ac
+```
+Por lo que da 0.1002x1 + 0.7851x2
+
+Se calcula el m 
+
+```{r}
+mc = 0.5*((ac%*%x1barrct)+(ac%*%x2barrct))
+mc
+```
+Por lo que si 0.1002x1 + 0.7851x2 =>  24.74 se asigna a pi1 y de caso contrario a pi 2
+
+Punto 1 D 
+Se prueban una por una las observaciones  
+
+```{r}
+m11=0
+m12=0
+m21=0
+m22=0
+x1d=0.1002
+x2d=0.7851
+pi1[1,1]
+for (x in 1:12) {
+  p = x1d*(pi1[x,1]) + x2d*(pi1[x,2])
+  if(p >= mc){
+    m11=m11+1
+  } else {
+    m12=m12+1
+  }
+} 
+for (x in 1:12) {
+  p1 = x1d*(pi2[x,1]) + x2d*(pi2[x,2])
+  if(p1 >= mc){
+    m21=m21+1
+  } else {
+    m22=m22+1
+  }
+} 
+confusion = array(c(m11,m21,m12,m22), dim=c(2, 2))
+confusion
+```
+
+Punto 1 e se calcula el error aper 
+
+```{r}
+aper = (m21+m12)/(m11+m21+m12+m22)
+aper
+```
+Punto 2a
+
+```{r}
+x1barr2 = array(c(-1,-1), dim=c(2, 1))
+x2barr2= array(c(2,1), dim=c(2, 1))
+spooled2 = array(c(7.3, -1.1, -1.1, 4.8), dim=c(2, 2))
+spinver2=solve(spooled2)
+x1x22=(x1barr2 - x2barr2)
+x1x22
+x1x2t2=t(x1x22)  
+x1x2t2
+x1x2t2%*%spinver2
+```
+
+Por lo que da -0.49x1 - 0.529x2
+
+Punto 2b 
+
+```{r}
+xcero2= array(c(0,1), dim=c(2, 1))
+xcero2
+a2 = x1x2t2%*%(spinver2%*%xcero2)
+
+x1x2sum2= (x1barr2 + x2barr2)
+m2 = (0.5*x1x2t2)%*%spinver2 %*% x1x2sum2
+
+if (a2>m2) {
+  print("Se toma pi 1")
+} else if (a2==m2){
+  print("Se toma pi 1")
+} else {
+  print ("Se toma pi 2")
+}
+```
+
+
